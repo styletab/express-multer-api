@@ -2,6 +2,8 @@
 // bin/s3-upload.js
 'use strict';
 
+// this for the command line
+
 const fs = require('fs');
 
 const AWSupload = require('../lib/s3-upload').upload;

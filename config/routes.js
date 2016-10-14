@@ -19,7 +19,7 @@ module.exports = require('lib/wiring/routes')
 
 // custom routes
 // .post('/uploads', 'uploads#create') // reminder this reads as making a post request to /uploads to the uploads controller create application
-.resources('uploads', {only: ['create'] })
+.resources('uploads', {only: ['index', 'show','create'] })
 
 // all routes created
 ;
