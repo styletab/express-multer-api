@@ -1,7 +1,13 @@
 'use strict';
 
+// this has to become before anything else
+// this is getting the object from the export of the .dotenv module and calling .config (which is responsible for reading the .env file and brings the those key definitions into node)
+require('dotenv').config();
+
 const fs = require('fs');
 const fileType = require('file-type');
+const AWS = require('aws-sdk');
+// AWS is amazon's naming convention
 
 const filename = process.argv[2] || '';
 // by passing a blank string we'll get the following error: { [Error: ENOENT: no such file or directory, open ''] errno: -2, code: 'ENOENT', syscall: 'open', path: '' }
@@ -33,6 +39,13 @@ const parseFile = (fileBuffer) => {
   return file;
 };
 
+const s3 = new AWS.S3({
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  }
+});
+
 // upload is returning an object from parseFile and defining a dictionary to send down the promise chain
 const upload = (file) => {
   const options = {
@@ -47,15 +60,20 @@ const upload = (file) => {
     // pick a filename for S3 to use for the upload
     Key: `test/test.${file.ext}`
   };
-  // not actually uploaded yet just pass the data down the Promise chain
-  return Promise.resolve(options);
+  return new Promise((resolve, reject) => {
+    // upload is passing data to the callback
+    s3.upload(options, (error, data) => {
+      if (error) {
+        reject(error);
+      }
+      resolve(data);
+    });
+  });
 };
 
-const logMessage = (upload) => {
-  // get rid of the stream for now so I can log the rest of my options in the terminal with out seeing the stream
-  delete upload.Body;
+const logMessage = (response) => {
   // turn the pojo into a string so I can see the options
-    console.log(`the upload options are ${JSON.stringify(upload)}`); // <-- this is a template literal
+    console.log(`the response from aws was ${JSON.stringify(response)}`); // <-- this is a template literal
   };
 
 readFile(filename)
