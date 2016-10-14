@@ -17,5 +17,9 @@ module.exports = require('lib/wiring/routes')
 .patch('/change-password/:id', 'users#changepw')
 .resources('users', { only: ['index', 'show'] })
 
+// custom routes
+// .post('/uploads', 'uploads#create') // reminder this reads as making a post request to /uploads to the uploads controller create application
+.resources('uploads', {only: ['create'] })
+
 // all routes created
 ;
